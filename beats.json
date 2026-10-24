@@ -150,7 +150,9 @@
       "type": "beat",
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/sinais-de-fogo-sm8x.mp3",
       "size": 6579840,
-      "duration": 164
+      "duration": 164,
+      "folder": "guias-jedy",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/sinais-de-fogo-brd4.jpg"
     }
   ]
 }
