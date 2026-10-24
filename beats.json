@@ -91,6 +91,17 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/veja-o-que-fala-4ce3.mp3",
       "size": 6499200,
       "duration": 162
+    },
+    {
+      "id": "idk-z6cx",
+      "name": "IDK",
+      "date": "2026-10-24",
+      "folder": "guias-jedy",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/idk-x0bj.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/idk-2ba5.mp3",
+      "size": 5885760,
+      "duration": 147
     }
   ]
 }
