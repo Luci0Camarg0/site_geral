@@ -69,6 +69,17 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/fabrica-do-willy-wonka-cek7.mp3",
       "size": 8617920,
       "duration": 215
+    },
+    {
+      "id": "p-j-a-1pib",
+      "name": "P.J.A",
+      "date": "2026-10-24",
+      "folder": "guias-jedy",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/p-j-a-y7fl.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/p-j-a-ysta.mp3",
+      "size": 6780480,
+      "duration": 170
     }
   ]
 }
