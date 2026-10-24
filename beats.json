@@ -142,6 +142,15 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/diagnostico-kq55.mp3",
       "size": 7418880,
       "duration": 185
+    },
+    {
+      "id": "sinais-de-fogo-n2s4",
+      "name": "Sinais de Fogo",
+      "date": "2026-10-24",
+      "type": "beat",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/sinais-de-fogo-sm8x.mp3",
+      "size": 6579840,
+      "duration": 164
     }
   ]
 }
