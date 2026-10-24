@@ -2,10 +2,6 @@
   "storage": "https://terra-fertil.luciocamargocandido.workers.dev",
   "folders": [
     {
-      "id": "trap",
-      "name": "Trap"
-    },
-    {
       "id": "guias-jedy",
       "name": "GUIAS"
     }
