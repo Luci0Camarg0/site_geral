@@ -91,6 +91,16 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/idk-2ba5.mp3",
       "size": 5885760,
       "duration": 147
+    },
+    {
+      "id": "celebridade-15f6",
+      "name": "Celebridade",
+      "date": "2026-10-24",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/celebridade-ofid.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/celebridade-zame.mp3",
+      "size": 5929920,
+      "duration": 148
     }
   ]
 }
