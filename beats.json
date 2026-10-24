@@ -1,7 +1,14 @@
 {
+  "storage": "https://terra-fertil.luciocamargocandido.workers.dev",
   "folders": [
-    { "id": "boom-bap", "name": "Boom bap" },
-    { "id": "trap", "name": "Trap" }
+    {
+      "id": "boom-bap",
+      "name": "Boom bap"
+    },
+    {
+      "id": "trap",
+      "name": "Trap"
+    }
   ],
   "items": [
     {
@@ -11,7 +18,10 @@
       "bpm": 88,
       "key": "Lá menor",
       "date": "2026-10-24",
-      "tags": ["boom bap", "lo-fi"],
+      "tags": [
+        "boom bap",
+        "lo-fi"
+      ],
       "file": "beats/audio/vinil-riscado.mp3",
       "duration": 11,
       "folder": "boom-bap",
@@ -22,7 +32,9 @@
       "name": "Vinil Riscado (letra)",
       "type": "pdf",
       "date": "2026-10-24",
-      "tags": ["letra"],
+      "tags": [
+        "letra"
+      ],
       "file": "beats/pdf/vinil-riscado-letra.pdf",
       "size": 1013,
       "folder": "boom-bap",
@@ -35,7 +47,10 @@
       "bpm": 140,
       "key": "Fá# menor",
       "date": "2026-10-03",
-      "tags": ["trap", "dark"],
+      "tags": [
+        "trap",
+        "dark"
+      ],
       "folder": "trap",
       "example": true
     },
@@ -46,7 +61,10 @@
       "bpm": 92,
       "key": "Ré menor",
       "date": "2026-09-12",
-      "tags": ["boom bap", "sample"],
+      "tags": [
+        "boom bap",
+        "sample"
+      ],
       "example": true
     }
   ]
