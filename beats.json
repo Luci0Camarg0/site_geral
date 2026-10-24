@@ -12,19 +12,6 @@
   ],
   "items": [
     {
-      "id": "vinil-riscado-letra",
-      "name": "Vinil Riscado (letra)",
-      "type": "pdf",
-      "date": "2026-10-24",
-      "tags": [
-        "letra"
-      ],
-      "file": "beats/pdf/vinil-riscado-letra.pdf",
-      "size": 1013,
-      "folder": "boom-bap",
-      "example": true
-    },
-    {
       "id": "neblina",
       "name": "Neblina",
       "type": "beat",
