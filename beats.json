@@ -4,10 +4,6 @@
     {
       "id": "guias-jedy",
       "name": "GUIAS"
-    },
-    {
-      "id": "so-beats-4ipq",
-      "name": "SÓ BEATS"
     }
   ],
   "items": [
@@ -29,8 +25,7 @@
       "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/sede-e-fome-e5cd.jpg",
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/sede-e-fome-7qm9.mp3",
       "size": 6372480,
-      "duration": 159,
-      "folder": "so-beats-4ipq"
+      "duration": 159
     },
     {
       "id": "solidao-m9vw",
