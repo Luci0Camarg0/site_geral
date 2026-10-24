@@ -4,10 +4,6 @@
     {
       "id": "guias-jedy",
       "name": "GUIAS"
-    },
-    {
-      "id": "df-t9mf",
-      "name": "´DF"
     }
   ],
   "items": [
@@ -176,8 +172,7 @@
       "type": "pdf",
       "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/media-kit-as-meninas-do-rap-9l7c.jpg",
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/pdf/media-kit-as-meninas-do-rap-43zx.pdf",
-      "size": 7185983,
-      "folder": "df-t9mf"
+      "size": 7185983
     },
     {
       "id": "life-is-good-2a4p",
