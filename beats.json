@@ -132,6 +132,16 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/i-cant-stop-3ya7.mp3",
       "size": 7099200,
       "duration": 177
+    },
+    {
+      "id": "diagnostico-3x98",
+      "name": "Diagnóstico",
+      "date": "2026-10-24",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/diagnostico-6m4c.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/diagnostico-kq55.mp3",
+      "size": 7418880,
+      "duration": 185
     }
   ]
 }
