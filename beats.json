@@ -1,32 +1,53 @@
-[
-  {
-    "name": "Vinil Riscado",
-    "bpm": 88,
-    "key": "Lá menor",
-    "date": "2026-10-24",
-    "tags": ["boom bap", "lo-fi"],
-    "cover": "",
-    "audio": "beats/audio/vinil-riscado.mp3",
-    "example": true
-  },
-  {
-    "name": "Neblina",
-    "bpm": 140,
-    "key": "Fá# menor",
-    "date": "2026-10-03",
-    "tags": ["trap", "dark"],
-    "cover": "",
-    "audio": "",
-    "example": true
-  },
-  {
-    "name": "Madrugada na Zona Leste",
-    "bpm": 92,
-    "key": "Ré menor",
-    "date": "2026-09-12",
-    "tags": ["boom bap", "sample"],
-    "cover": "",
-    "audio": "",
-    "example": true
-  }
-]
+{
+  "folders": [
+    { "id": "boom-bap", "name": "Boom bap" },
+    { "id": "trap", "name": "Trap" }
+  ],
+  "items": [
+    {
+      "id": "vinil-riscado",
+      "name": "Vinil Riscado",
+      "type": "beat",
+      "bpm": 88,
+      "key": "Lá menor",
+      "date": "2026-10-24",
+      "tags": ["boom bap", "lo-fi"],
+      "file": "beats/audio/vinil-riscado.mp3",
+      "duration": 11,
+      "folder": "boom-bap",
+      "example": true
+    },
+    {
+      "id": "vinil-riscado-letra",
+      "name": "Vinil Riscado (letra)",
+      "type": "pdf",
+      "date": "2026-10-24",
+      "tags": ["letra"],
+      "file": "beats/pdf/vinil-riscado-letra.pdf",
+      "size": 1013,
+      "folder": "boom-bap",
+      "example": true
+    },
+    {
+      "id": "neblina",
+      "name": "Neblina",
+      "type": "beat",
+      "bpm": 140,
+      "key": "Fá# menor",
+      "date": "2026-10-03",
+      "tags": ["trap", "dark"],
+      "folder": "trap",
+      "example": true
+    },
+    {
+      "id": "madrugada-na-zona-leste",
+      "name": "Madrugada na Zona Leste",
+      "type": "beat",
+      "bpm": 92,
+      "key": "Ré menor",
+      "date": "2026-09-12",
+      "tags": ["boom bap", "sample"],
+      "example": true
+    }
+  ]
+}

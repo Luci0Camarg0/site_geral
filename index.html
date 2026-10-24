@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Cofre de Beats</title>
-<meta name="description" content="Instrumentais de rap com capa, BPM e player.">
+<title>Terra Fértil</title>
+<meta name="description" content="Beats de rap, instrumentais e arquivos, organizados em pastas.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <link rel="stylesheet" href="style.css">
@@ -13,13 +13,28 @@
 <div class="wrap">
   <header class="top">
     <div>
-      <h1>Cofre de <span>Beats</span></h1>
-      <p class="sub">Instrumentais de rap, prontos pra escutar.</p>
+      <h1>Terra <span>Fértil</span></h1>
+      <p class="sub">Instrumentais de rap e arquivos, organizados em pastas.</p>
+    </div>
+    <div class="headActions">
+      <button class="btn ghost sm" id="loginBtn">Modo editor</button>
+      <span class="headActions" id="editorBar" hidden>
+        <button class="btn primary" id="addBtn">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          Adicionar
+        </button>
+        <button class="btn" id="logoutBtn">Sair do editor</button>
+      </span>
     </div>
   </header>
 
   <div class="toolbar">
-    <input id="q" class="search" type="search" placeholder="Buscar por nome, tom ou tag" aria-label="Buscar beats">
+    <input id="q" class="search" type="search" placeholder="Buscar por nome, tom ou tag" aria-label="Buscar">
+    <select id="type" class="sel" aria-label="Tipo">
+      <option value="all">Beats e PDFs</option>
+      <option value="beat">Só beats</option>
+      <option value="pdf">Só PDFs</option>
+    </select>
     <select id="sort" class="sel" aria-label="Ordenar">
       <option value="date-desc">Mais recentes</option>
       <option value="date-asc">Mais antigos</option>
@@ -34,8 +49,16 @@
       <button id="vList" aria-pressed="false">Lista</button>
     </div>
   </div>
+  <nav class="folders" id="folders" aria-label="Pastas"></nav>
   <div class="tags" id="tags"></div>
-  <div class="count mono" id="count"></div>
+  <div class="countRow">
+    <div class="count mono" id="count"></div>
+    <div class="folderTools" id="folderTools" hidden>
+      <button class="link" id="renameFolderBtn">Renomear pasta</button>
+      <button class="link" id="deleteFolderBtn">Apagar pasta</button>
+    </div>
+  </div>
+  <p class="hint" id="dragHint" hidden>Arraste um item até uma pasta para mover. No celular, use Editar e escolha a pasta.</p>
   <main id="out"></main>
 </div>
 
@@ -59,6 +82,85 @@
   </div>
 </div>
 
+
+<div class="scrim" id="itemDlg" hidden>
+  <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="itemTitle">
+    <h2 id="itemTitle">Adicionar</h2>
+    <form id="itemForm" class="form">
+      <div class="field full">
+        <label for="fFile">Arquivo (áudio ou PDF)</label>
+        <div class="drop"><div class="info"><input id="fFile" type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac,application/pdf,.pdf"><span id="fileInfo">MP3 é o mais leve. WAV e PDF também funcionam. Até 45 MB.</span></div></div>
+      </div>
+      <div class="field full"><label for="fName">Nome</label><input id="fName" required maxlength="80" placeholder="Ex.: Madrugada na Zona Leste"></div>
+      <div class="field beat-only"><label for="fBpm">BPM</label><input id="fBpm" type="number" min="40" max="220" placeholder="90"></div>
+      <div class="field beat-only"><label for="fKey">Tom</label><input id="fKey" maxlength="12" placeholder="Ex.: Lá menor"></div>
+      <div class="field"><label for="fDate">Data</label><input id="fDate" type="date"></div>
+      <div class="field"><label for="fFolder">Pasta</label><select id="fFolder"></select></div>
+      <div class="field full"><label for="fTags">Tags</label><input id="fTags" maxlength="120" placeholder="boom bap, trap, sample"></div>
+      <div class="field full">
+        <label for="fCover">Foto de capa (opcional)</label>
+        <div class="drop"><div class="cover" id="coverPrev"></div><div class="info"><input id="fCover" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><span id="coverInfo">PNG, JPG ou WebP. Fica quadrada automaticamente.</span></div></div>
+      </div>
+    </form>
+    <div class="msg" id="itemMsg"></div>
+    <div class="confirm" id="itemConfirm" hidden>
+      <span>Apagar este item de vez? O arquivo e a capa somem do site.</span>
+      <span style="display:flex;gap:8px"><button class="btn" id="itemNoDel" type="button">Cancelar</button><button class="btn danger" id="itemYesDel" type="button">Apagar</button></span>
+    </div>
+    <div class="actions">
+      <button class="btn danger" id="itemDelBtn" type="button" hidden>Apagar</button>
+      <div class="r">
+        <button class="btn" type="button" data-close>Cancelar</button>
+        <button class="btn primary" id="itemSave" type="submit" form="itemForm">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="folderDlg" hidden>
+  <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="folderTitle">
+    <h2 id="folderTitle">Nova pasta</h2>
+    <form id="folderForm" class="form">
+      <div class="field full"><label for="fFolderName">Nome da pasta</label><input id="fFolderName" required maxlength="40" placeholder="Ex.: Boom bap"></div>
+    </form>
+    <div class="msg" id="folderMsg"></div>
+    <div class="confirm" id="folderConfirm" hidden>
+      <span>Apagar a pasta? Os itens dela não são apagados, só vão para Sem pasta.</span>
+      <span style="display:flex;gap:8px"><button class="btn" id="folderNoDel" type="button">Cancelar</button><button class="btn danger" id="folderYesDel" type="button">Apagar pasta</button></span>
+    </div>
+    <div class="actions">
+      <div class="r">
+        <button class="btn" type="button" data-close>Cancelar</button>
+        <button class="btn primary" id="folderSave" type="submit" form="folderForm">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="loginDlg" hidden>
+  <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <h2 id="loginTitle">Modo editor</h2>
+    <p>Para adicionar, mover e apagar itens, o site salva direto no seu repositório do GitHub. Ele precisa de uma chave de acesso (token), que fica guardada só neste navegador.</p>
+    <ol>
+      <li>Abra <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a></li>
+      <li>Em <b>Repository access</b>, escolha <b>Only select repositories</b> e marque <b>site_geral</b></li>
+      <li>Em <b>Permissions</b>, ache <b>Contents</b> e mude para <b>Read and write</b></li>
+      <li>Clique em <b>Generate token</b>, copie e cole aqui</li>
+    </ol>
+    <form id="loginForm" class="form">
+      <div class="field full"><label for="fToken">Token</label><input id="fToken" type="password" required autocomplete="off" placeholder="github_pat_..."></div>
+    </form>
+    <div class="msg" id="loginMsg"></div>
+    <div class="actions">
+      <div class="r">
+        <button class="btn" type="button" data-close>Cancelar</button>
+        <button class="btn primary" id="loginSave" type="submit" form="loginForm">Entrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
 <audio id="audio" preload="none"></audio>
 <script src="app.js"></script>
 </body>
