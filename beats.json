@@ -58,6 +58,17 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/nao-chores-ap88.mp3",
       "size": 7747200,
       "duration": 194
+    },
+    {
+      "id": "fabrica-do-willy-wonka-3nzk",
+      "name": "Fábrica do Willy Wonka",
+      "date": "2026-10-24",
+      "folder": "guias-jedy",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/fabrica-do-willy-wonka-uum1.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/fabrica-do-willy-wonka-cek7.mp3",
+      "size": 8617920,
+      "duration": 215
     }
   ]
 }
