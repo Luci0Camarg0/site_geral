@@ -164,6 +164,15 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/sr-doutor-utn3.wav",
       "size": 42953228,
       "duration": 149
+    },
+    {
+      "id": "media-kit-as-meninas-do-rap-0uur",
+      "name": "Media Kit – As Meninas do Rap",
+      "date": "2026-10-24",
+      "type": "pdf",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/media-kit-as-meninas-do-rap-9l7c.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/pdf/media-kit-as-meninas-do-rap-43zx.pdf",
+      "size": 7185983
     }
   ]
 }
