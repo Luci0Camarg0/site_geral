@@ -47,6 +47,17 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/az-arabia-q0gd.mp3",
       "size": 6272640,
       "duration": 157
+    },
+    {
+      "id": "nao-chores-8vqn",
+      "name": "Não Chores",
+      "date": "2026-10-24",
+      "folder": "guias-jedy",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/nao-chores-hssw.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/nao-chores-ap88.mp3",
+      "size": 7747200,
+      "duration": 194
     }
   ]
 }
