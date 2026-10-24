@@ -2,10 +2,6 @@
   "storage": "https://terra-fertil.luciocamargocandido.workers.dev",
   "folders": [
     {
-      "id": "boom-bap",
-      "name": "Boom bap"
-    },
-    {
       "id": "trap",
       "name": "Trap"
     },
