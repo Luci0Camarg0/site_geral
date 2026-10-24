@@ -101,6 +101,17 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/celebridade-zame.mp3",
       "size": 5929920,
       "duration": 148
+    },
+    {
+      "id": "deserto-do-gaara-fi5w",
+      "name": "Deserto do Gaara",
+      "date": "2026-10-24",
+      "folder": "guias-jedy",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/deserto-do-gaara-rk82.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/deserto-do-gaara-3nkr.mp3",
+      "size": 5486400,
+      "duration": 137
     }
   ]
 }
