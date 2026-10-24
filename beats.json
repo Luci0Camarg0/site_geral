@@ -30,6 +30,16 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/sede-e-fome-7qm9.mp3",
       "size": 6372480,
       "duration": 159
+    },
+    {
+      "id": "solidao-m9vw",
+      "name": "Solidão",
+      "date": "2026-10-24",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/solidao-pitv.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/solidao-og8b.mp3",
+      "size": 5958720,
+      "duration": 149
     }
   ]
 }
