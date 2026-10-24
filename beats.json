@@ -37,6 +37,16 @@
       "size": 5958720,
       "duration": 149,
       "folder": "guias-jedy"
+    },
+    {
+      "id": "az-arabia-rj6c",
+      "name": "Az Arabia",
+      "date": "2026-10-24",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/az-arabia-p884.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/az-arabia-q0gd.mp3",
+      "size": 6272640,
+      "duration": 157
     }
   ]
 }
