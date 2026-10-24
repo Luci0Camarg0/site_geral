@@ -58,17 +58,6 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/nao-chores-ap88.mp3",
       "size": 7747200,
       "duration": 194
-    },
-    {
-      "id": "quedra-livre-4u3w",
-      "name": "Quedra Livre",
-      "date": "2026-10-24",
-      "type": "beat",
-      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/quedra-livre-1s77.jpg",
-      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/quedra-livre-vzzd.mp3",
-      "size": 11489280,
-      "duration": 287,
-      "folder": "guias-jedy"
     }
   ]
 }
