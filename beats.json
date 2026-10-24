@@ -20,6 +20,16 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/a-volta-do-plug-uxvs.mp3",
       "size": 6792000,
       "duration": 170
+    },
+    {
+      "id": "sede-e-fome-8msi",
+      "name": "Sede e Fome",
+      "date": "2026-10-24",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/sede-e-fome-e5cd.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/sede-e-fome-7qm9.mp3",
+      "size": 6372480,
+      "duration": 159
     }
   ]
 }
