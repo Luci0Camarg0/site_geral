@@ -122,6 +122,16 @@
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/feel-me-8bvb.mp3",
       "size": 6295680,
       "duration": 157
+    },
+    {
+      "id": "i-cant-stop-9jaj",
+      "name": "I Cant Stop",
+      "date": "2026-10-24",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/i-cant-stop-40hs.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/i-cant-stop-3ya7.mp3",
+      "size": 7099200,
+      "duration": 177
     }
   ]
 }
