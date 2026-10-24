@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Vinil Riscado",
+    "bpm": 88,
+    "key": "Lá menor",
+    "date": "2026-10-24",
+    "tags": ["boom bap", "lo-fi"],
+    "cover": "",
+    "audio": "beats/audio/vinil-riscado.mp3",
+    "example": true
+  },
+  {
+    "name": "Neblina",
+    "bpm": 140,
+    "key": "Fá# menor",
+    "date": "2026-10-03",
+    "tags": ["trap", "dark"],
+    "cover": "",
+    "audio": "",
+    "example": true
+  },
+  {
+    "name": "Madrugada na Zona Leste",
+    "bpm": 92,
+    "key": "Ré menor",
+    "date": "2026-09-12",
+    "tags": ["boom bap", "sample"],
+    "cover": "",
+    "audio": "",
+    "example": true
+  }
+]
