@@ -176,12 +176,14 @@
     },
     {
       "id": "life-is-good-2a4p",
-      "name": "Life is Good",
+      "name": "Toda Criança",
       "date": "2026-10-24",
       "type": "beat",
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/life-is-good-6j3i.mp3",
       "size": 7479360,
-      "duration": 187
+      "duration": 187,
+      "folder": "guias-jedy",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/toda-crianca-j0ul.jpg"
     }
   ]
 }
