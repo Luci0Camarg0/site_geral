@@ -2,11 +2,12 @@
   // Where the editor mode saves. The public site reads beats.json; the editor writes it through the GitHub API.
   const REPO = { owner: "Luci0Camarg0", name: "site_geral", branch: "main" };
   const API = `https://api.github.com/repos/${REPO.owner}/${REPO.name}`;
-  const MAX_BYTES = 45 * 1024 * 1024;
+  const MB = 1024 * 1024;
+  const maxBytes = () => (data.storage ? 95 : 45) * MB; // Cloudflare Worker upload cap vs. what the GitHub API takes comfortably
 
   const $ = (id) => document.getElementById(id);
   const audio = $("audio");
-  let data = { folders: [], items: [] }, loaded = false, failed = false;
+  let data = { storage: "", folders: [], items: [] }, loaded = false, failed = false;
   let view = "grid", folderSel = "all", activeTag = null, currentId = null;
   let token = null;
   const localUrls = new Map(); // repo path -> blob URL, for files uploaded this session that Pages hasn't deployed yet
@@ -29,6 +30,7 @@
   const rand = () => Math.random().toString(36).slice(2, 6);
   const ext = (p) => (String(p).match(/\.([a-z0-9]+)$/i) || [, ""])[1].toLowerCase();
   const url = (p) => localUrls.get(p) || p;
+  const isRemote = (p) => /^https?:\/\//.test(p || "");
   const folderName = (id) => data.folders.find((f) => f.id === id)?.name || "";
   const dlName = (it) => (slug(it.name) || "arquivo") + (ext(it.file) ? "." + ext(it.file) : "");
 
@@ -48,7 +50,8 @@
       out.folder = folders.some((f) => f.id === it.folder) ? it.folder : null;
       return out;
     });
-    return { folders, items };
+    const storage = typeof src.storage === "string" && isRemote(src.storage) ? src.storage.trim().replace(/\/+$/, "") : "";
+    return { storage, folders, items };
   }
 
   /* ---------- filtering ---------- */
@@ -102,8 +105,10 @@
     const lab = it.file ? (isPlaying(it.id) ? "Pausar " : "Tocar ") + esc(it.name) : "Sem áudio";
     return `<button class="${cls}" data-play="${esc(it.id)}" ${it.file ? "" : "disabled"} aria-label="${lab}">${isPlaying(it.id) ? I.pause : I.play}</button>`;
   }
+  // Cross-origin files ignore the download attribute, so the Worker sends them as attachments via ?dl=.
+  const dlHref = (it) => isRemote(it.file) ? it.file + "?dl=" + encodeURIComponent(dlName(it)) : url(it.file);
   const downloadLink = (it, compact) => it.file
-    ? `<a class="${compact ? "iconlink" : "link"}" href="${esc(url(it.file))}" download="${esc(dlName(it))}" aria-label="Baixar ${esc(it.name)}">${I.down}${compact ? "" : "Baixar"}</a>`
+    ? `<a class="${compact ? "iconlink" : "link"}" href="${esc(dlHref(it))}" download="${esc(dlName(it))}" aria-label="Baixar ${esc(it.name)}">${I.down}${compact ? "" : "Baixar"}</a>`
     : "";
 
   function facts(it) {
@@ -253,12 +258,12 @@
     try {
       const r = await gh(contentsPath("beats.json") + "?ref=" + REPO.branch);
       return { data: normalize(JSON.parse(b64ToText(r.content))), sha: r.sha };
-    } catch (e) { if (e.status === 404) return { data: { folders: [], items: [] }, sha: null }; throw e; }
+    } catch (e) { if (e.status === 404) return { data: { storage: "", folders: [], items: [] }, sha: null }; throw e; }
   }
   function serialize(d) {
     const keep = ([k, v]) => v != null && v !== "" && v !== false && !(Array.isArray(v) && !v.length);
     const clean = (it) => Object.fromEntries(Object.entries(it).filter(keep));
-    return JSON.stringify({ folders: d.folders, items: d.items.map(clean) }, null, 2) + "\n";
+    return JSON.stringify({ ...(d.storage ? { storage: d.storage } : {}), folders: d.folders, items: d.items.map(clean) }, null, 2) + "\n";
   }
   // Re-read beats.json, apply the change to the fresh copy, write it back. Retries once if someone else saved in between.
   async function saveData(mutate, message) {
@@ -273,13 +278,29 @@
       } catch (e) { if (attempt === 0 && (e.status === 409 || e.status === 422)) continue; throw e; }
     }
   }
+  // Stores a file and returns what goes in beats.json: a full Cloudflare URL, or a repo path when no storage is set.
   async function uploadFile(path, blob, message) {
+    if (data.storage) {
+      const key = path.replace(/^beats\//, "");
+      const r = await fetch(`${data.storage}/${key.split("/").map(encodeURIComponent).join("/")}`, {
+        method: "PUT", body: blob, headers: { Authorization: "Bearer " + token, "Content-Type": blob.type || "application/octet-stream" },
+      });
+      if (!r.ok) throw new GhError(r.status === 401 ? 403 : r.status, await r.text().catch(() => ""));
+      const ref = `${data.storage}/${key}`;
+      localUrls.set(ref, URL.createObjectURL(blob));
+      return ref;
+    }
     const b64 = bytesToB64(new Uint8Array(await blob.arrayBuffer()));
     await gh(contentsPath(path), { method: "PUT", body: JSON.stringify({ message, content: b64, branch: REPO.branch }) });
     localUrls.set(path, URL.createObjectURL(blob));
+    return path;
   }
   async function deleteFile(path, message) {
     try {
+      if (isRemote(path)) {
+        if (data.storage && path.startsWith(data.storage + "/")) await fetch(path, { method: "DELETE", headers: { Authorization: "Bearer " + token } });
+        return;
+      }
       const r = await gh(contentsPath(path) + "?ref=" + REPO.branch);
       await gh(contentsPath(path), { method: "DELETE", body: JSON.stringify({ message, sha: r.sha, branch: REPO.branch }) });
     } catch (e) { /* already gone or not ours to delete: the list entry is what matters */ }
@@ -287,8 +308,8 @@
   function errText(e) {
     if (e?.status === 401) return "O token não vale mais. Saia do editor e entre de novo com um token novo.";
     if (e?.status === 403 || e?.status === 404) return "O token não tem permissão de escrita. Confira se ele tem Contents: Read and write no repositório site_geral.";
-    if (e?.status === 422 && /too large|size/i.test(e.message)) return "O arquivo é grande demais para o GitHub. Tente um MP3.";
-    if (e instanceof TypeError) return "Sem conexão com o GitHub. Confira a internet e tente de novo.";
+    if (e?.status === 413 || (e?.status === 422 && /too large|size/i.test(e.message))) return "O arquivo é grande demais. Tente um MP3.";
+    if (e instanceof TypeError) return data.storage ? "Não deu pra falar com o GitHub ou o Cloudflare. Confira a internet e o endereço em Armazenamento." : "Sem conexão com o GitHub. Confira a internet e tente de novo.";
     return "Algo deu errado ao salvar" + (e?.message ? ` (${e.message})` : "") + ". Tente de novo.";
   }
   const PUBLISH_NOTE = "Salvo. O site público atualiza em cerca de 1 minuto.";
@@ -421,7 +442,7 @@
     $("fFolder").innerHTML = `<option value="">Sem pasta</option>` + data.folders.map((f) => `<option value="${esc(f.id)}">${esc(f.name)}</option>`).join("");
     $("fFolder").value = it ? (it.folder || "") : (["all", "none"].includes(folderSel) ? "" : folderSel);
     $("fFile").value = ""; $("fCover").value = "";
-    $("fileInfo").textContent = it?.file ? `Arquivo salvo${it.duration ? " (" + fmt(it.duration) + ")" : ""}. Escolha outro pra trocar.` : "MP3 é o mais leve. WAV e PDF também funcionam. Até 45 MB.";
+    $("fileInfo").textContent = it?.file ? `Arquivo salvo${it.duration ? " (" + fmt(it.duration) + ")" : ""}. Escolha outro pra trocar.` : `MP3 é o mais leve. WAV e PDF também funcionam. Até ${maxBytes() / MB} MB, guardado no ${data.storage ? "Cloudflare" : "GitHub"}.`;
     $("coverPrev").innerHTML = coverHTML(it || { name: "Capa", type: "beat" });
     $("coverInfo").textContent = it?.cover ? "Escolha outra imagem pra trocar a capa." : "PNG, JPG ou WebP. Fica quadrada automaticamente.";
     $("itemDelBtn").hidden = !it; $("itemConfirm").hidden = true;
@@ -432,7 +453,7 @@
   $("fFile").addEventListener("change", (e) => {
     const f = e.target.files[0]; newFile = null; newDuration = null;
     if (!f) return syncKind();
-    if (f.size > MAX_BYTES) { setMsg("itemMsg", `Esse arquivo tem ${fmtSize(f.size)}. O limite é 45 MB; exporte em MP3 pra ficar menor.`, true); e.target.value = ""; return; }
+    if (f.size > maxBytes()) { setMsg("itemMsg", `Esse arquivo tem ${fmtSize(f.size)}. O limite é ${maxBytes() / MB} MB; exporte em MP3 pra ficar menor.`, true); e.target.value = ""; return; }
     setMsg("itemMsg", "");
     newFile = f;
     if (!$("fName").value.trim()) $("fName").value = f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim();
@@ -490,13 +511,11 @@
       const old = { file: editing?.file, cover: editing?.cover };
       if (newCover) {
         setMsg("itemMsg", "Enviando capa…");
-        fields.cover = `beats/capas/${base}-${rand()}.jpg`;
-        await uploadFile(fields.cover, newCover, `Capa: ${name}`);
+        fields.cover = await uploadFile(`beats/capas/${base}-${rand()}.jpg`, newCover, `Capa: ${name}`);
       }
       if (newFile) {
         setMsg("itemMsg", `Enviando ${type === "pdf" ? "PDF" : "áudio"} (${fmtSize(newFile.size)})…`);
-        fields.file = `beats/${type === "pdf" ? "pdf" : "audio"}/${base}-${rand()}.${ext(newFile.name) || (type === "pdf" ? "pdf" : "mp3")}`;
-        await uploadFile(fields.file, newFile, `${type === "pdf" ? "PDF" : "Beat"}: ${name}`);
+        fields.file = await uploadFile(`beats/${type === "pdf" ? "pdf" : "audio"}/${base}-${rand()}.${ext(newFile.name) || (type === "pdf" ? "pdf" : "mp3")}`, newFile, `${type === "pdf" ? "PDF" : "Beat"}: ${name}`);
         fields.size = newFile.size;
         fields.duration = type === "beat" && newDuration ? Math.round(newDuration) : null;
         fields.example = false;
@@ -527,6 +546,33 @@
       close($("itemForm")); toast("Apagado.");
       for (const p of [it.cover, it.file]) if (p) await deleteFile(p, `Apaga arquivo: ${it.name}`);
     } catch (err) { setMsg("itemMsg", errText(err), true); }
+  });
+
+  // storage (Cloudflare Worker address)
+  $("storageBtn").addEventListener("click", () => {
+    $("fStorage").value = data.storage || "";
+    $("storageNow").textContent = data.storage ? "Hoje os arquivos novos vão para o Cloudflare." : "Hoje os arquivos novos vão para o GitHub (limite de cerca de 1 GB).";
+    setMsg("storageMsg", "");
+    open("storageDlg");
+  });
+  $("storageForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    let v = $("fStorage").value.trim().replace(/\/+$/, "");
+    if (v && !/^https?:\/\//.test(v)) v = "https://" + v;
+    $("storageSave").disabled = true;
+    try {
+      if (v) {
+        setMsg("storageMsg", "Testando o endereço…");
+        let ok = false;
+        try { const r = await fetch(v + "/"); ok = r.ok && /Terra F/.test(await r.text()); } catch (err) {}
+        if (!ok) { setMsg("storageMsg", "Esse endereço não respondeu como o Worker do Terra Fértil. Confira se colou o código do worker.js e ligou o bucket com o nome BEATS.", true); return; }
+      }
+      setMsg("storageMsg", "Salvando…");
+      await saveData((d) => { d.storage = v; }, v ? "Usa o Cloudflare para os arquivos" : "Volta a guardar os arquivos no GitHub");
+      close($("storageForm"));
+      toast(v ? "Pronto. Os próximos arquivos vão para o Cloudflare." : "Pronto. Os próximos arquivos vão para o GitHub.");
+    } catch (err) { setMsg("storageMsg", errText(err), true); }
+    finally { $("storageSave").disabled = false; }
   });
 
   /* ---------- clicks & controls ---------- */

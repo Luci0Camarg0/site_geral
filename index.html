@@ -23,6 +23,7 @@
           <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
           Adicionar
         </button>
+        <button class="btn" id="storageBtn">Armazenamento</button>
         <button class="btn" id="logoutBtn">Sair do editor</button>
       </span>
     </div>
@@ -155,6 +156,24 @@
       <div class="r">
         <button class="btn" type="button" data-close>Cancelar</button>
         <button class="btn primary" id="loginSave" type="submit" form="loginForm">Entrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="storageDlg" hidden>
+  <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="storageTitle">
+    <h2 id="storageTitle">Armazenamento</h2>
+    <p id="storageNow"></p>
+    <p>Para guardar os arquivos no Cloudflare (10 GB grátis), cole aqui o endereço do seu Worker, que termina em <b>workers.dev</b>. O passo a passo para criar está no <a href="https://github.com/Luci0Camarg0/site_geral#guardar-os-arquivos-no-cloudflare" target="_blank" rel="noopener">README do repositório</a>. Os arquivos que já estão no GitHub continuam funcionando.</p>
+    <form id="storageForm" class="form">
+      <div class="field full"><label for="fStorage">Endereço do Worker</label><input id="fStorage" type="text" inputmode="url" autocomplete="off" placeholder="https://terra-fertil.seu-nome.workers.dev"></div>
+    </form>
+    <div class="msg" id="storageMsg"></div>
+    <div class="actions">
+      <div class="r">
+        <button class="btn" type="button" data-close>Cancelar</button>
+        <button class="btn primary" id="storageSave" type="submit" form="storageForm">Salvar</button>
       </div>
     </div>
   </div>
