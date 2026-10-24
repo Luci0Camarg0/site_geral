@@ -173,6 +173,15 @@
       "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/media-kit-as-meninas-do-rap-9l7c.jpg",
       "file": "https://terra-fertil.luciocamargocandido.workers.dev/pdf/media-kit-as-meninas-do-rap-43zx.pdf",
       "size": 7185983
+    },
+    {
+      "id": "life-is-good-2a4p",
+      "name": "Life is Good",
+      "date": "2026-10-24",
+      "type": "beat",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/life-is-good-6j3i.mp3",
+      "size": 7479360,
+      "duration": 187
     }
   ]
 }
