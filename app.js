@@ -243,6 +243,7 @@
   class GhError extends Error { constructor(status, msg) { super(msg); this.status = status; } }
   async function gh(path, opts = {}) {
     const r = await fetch(API + path, {
+      cache: "no-store", // the API answers with max-age=60; a cached beats.json carries a stale sha and every save after a change fails
       ...opts,
       headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", ...(opts.body ? { "Content-Type": "application/json" } : {}) },
     });
@@ -256,7 +257,7 @@
 
   async function ghReadData() {
     try {
-      const r = await gh(contentsPath("beats.json") + "?ref=" + REPO.branch);
+      const r = await gh(contentsPath("beats.json") + "?ref=" + REPO.branch + "&t=" + Date.now());
       return { data: normalize(JSON.parse(b64ToText(r.content))), sha: r.sha };
     } catch (e) { if (e.status === 404) return { data: { storage: "", folders: [], items: [] }, sha: null }; throw e; }
   }
@@ -275,7 +276,10 @@
         data = fresh;
         render();
         return;
-      } catch (e) { if (attempt === 0 && (e.status === 409 || e.status === 422)) continue; throw e; }
+      } catch (e) {
+        if (attempt < 3 && (e.status === 409 || e.status === 422)) { await new Promise((r) => setTimeout(r, 800 * (attempt + 1))); continue; }
+        throw e;
+      }
     }
   }
   // Stores a file and returns what goes in beats.json: a full Cloudflare URL, or a repo path when no storage is set.
