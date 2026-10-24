@@ -12,20 +12,6 @@
   ],
   "items": [
     {
-      "id": "neblina",
-      "name": "Neblina",
-      "type": "beat",
-      "bpm": 140,
-      "key": "Fá# menor",
-      "date": "2026-10-03",
-      "tags": [
-        "trap",
-        "dark"
-      ],
-      "folder": "trap",
-      "example": true
-    },
-    {
       "id": "madrugada-na-zona-leste",
       "name": "Madrugada na Zona Leste",
       "type": "beat",
