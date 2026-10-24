@@ -153,6 +153,17 @@
       "duration": 164,
       "folder": "guias-jedy",
       "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/sinais-de-fogo-brd4.jpg"
+    },
+    {
+      "id": "sr-doutor-lz6c",
+      "name": "Sr Doutor",
+      "date": "2026-10-24",
+      "folder": "guias-jedy",
+      "type": "beat",
+      "cover": "https://terra-fertil.luciocamargocandido.workers.dev/capas/sr-doutor-xrmi.jpg",
+      "file": "https://terra-fertil.luciocamargocandido.workers.dev/audio/sr-doutor-utn3.wav",
+      "size": 42953228,
+      "duration": 149
     }
   ]
 }
