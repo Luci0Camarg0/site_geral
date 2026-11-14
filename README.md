@@ -35,6 +35,14 @@ O GitHub dá cerca de 1 GB para o site. Para ter mais espaço, os áudios, PDFs 
 A partir daí, tudo que você adicionar vai para o Cloudflare (até 95 MB por arquivo). Os arquivos que já estavam no GitHub continuam funcionando.
 O Worker só aceita uploads de quem usar um token do GitHub com permissão de escrita neste repositório; tocar e baixar é aberto para todos.
 
+## Qualquer pessoa pode adicionar
+
+Com o Worker do Cloudflare ligado, o botão **Adicionar beat** aparece pra todo mundo, sem login. Quem envia pode colocar o próprio nome, que aparece como "por …" no beat.
+A lista de beats fica guardada no Cloudflare (`data/list.json` no bucket), não mais no `beats.json` do GitHub. O `beats.json` só diz onde está o Worker.
+Mover, editar, apagar e mexer em pastas continua exigindo o **Modo editor**.
+
+Proteções: só áudio (MP3, WAV, M4A, AAC, OGG, FLAC) e PDF, até 95 MB por arquivo e 5 MB por capa, e no máximo 20 itens por hora vindos do mesmo endereço de internet.
+
 ## Adicionar à mão
 
 1. Suba o arquivo em `beats/audio/` (áudio) ou `beats/pdf/` (PDF), e a capa em `beats/capas/`.

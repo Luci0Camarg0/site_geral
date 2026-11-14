@@ -7,7 +7,7 @@
 <meta name="description" content="Beats de rap, instrumentais e arquivos, organizados em pastas.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <div class="wrap">
@@ -18,11 +18,11 @@
     </div>
     <div class="headActions">
       <button class="btn ghost sm" id="loginBtn">Modo editor</button>
+      <button class="btn primary" id="addBtn" hidden>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        Adicionar beat
+      </button>
       <span class="headActions" id="editorBar" hidden>
-        <button class="btn primary" id="addBtn">
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-          Adicionar
-        </button>
         <button class="btn" id="storageBtn">Armazenamento</button>
         <button class="btn" id="logoutBtn">Sair do editor</button>
       </span>
@@ -97,6 +97,8 @@
       <div class="field beat-only"><label for="fKey">Tom</label><input id="fKey" maxlength="12" placeholder="Ex.: Lá menor"></div>
       <div class="field"><label for="fDate">Data</label><input id="fDate" type="date"></div>
       <div class="field"><label for="fFolder">Pasta</label><select id="fFolder"></select></div>
+      <div class="field full" id="authorField"><label for="fAuthor">Seu nome (opcional)</label><input id="fAuthor" maxlength="40" placeholder="Aparece como &quot;por …&quot; no beat"></div>
+      <div class="field full" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"><label for="fWebsite">Site</label><input id="fWebsite" tabindex="-1" autocomplete="off"></div>
       <div class="field full"><label for="fTags">Tags</label><input id="fTags" maxlength="120" placeholder="boom bap, trap, sample"></div>
       <div class="field full">
         <label for="fCover">Foto de capa (opcional)</label>
@@ -181,6 +183,6 @@
 
 <div class="toast" id="toast" role="status" hidden></div>
 <audio id="audio" preload="none"></audio>
-<script src="app.js?v=3"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

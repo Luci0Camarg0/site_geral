@@ -3,13 +3,15 @@
   const REPO = { owner: "Luci0Camarg0", name: "site_geral", branch: "main" };
   const API = `https://api.github.com/repos/${REPO.owner}/${REPO.name}`;
   const MB = 1024 * 1024;
-  const maxBytes = () => (data.storage ? 95 : 45) * MB; // Cloudflare Worker upload cap vs. what the GitHub API takes comfortably
+  const maxBytes = () => (data.storage ? 95 : 45) * MB;
+  const AUDIO_EXTS = ["mp3", "wav", "m4a", "aac", "ogg", "flac"]; // Cloudflare Worker upload cap vs. what the GitHub API takes comfortably
 
   const $ = (id) => document.getElementById(id);
   const audio = $("audio");
   let data = { storage: "", folders: [], items: [] }, loaded = false, failed = false;
   let view = "grid", folderSel = "all", activeTag = null, currentId = null;
   let token = null;
+  let listMode = false, listEtag = ""; // listMode: the list lives in the Cloudflare Worker and anyone can add to it
   const localUrls = new Map(); // repo path -> blob URL, for files uploaded this session that Pages hasn't deployed yet
 
   const store = {
@@ -116,6 +118,7 @@
       ? ["PDF", fmtSize(it.size), fmtDate(it.date)]
       : [it.bpm ? `${it.bpm} BPM` : "", it.key || "", it.duration ? fmt(it.duration) : "", fmtDate(it.date)];
     if (folderSel === "all" && it.folder) f.push(folderName(it.folder));
+    if (it.author) f.push("por " + it.author);
     return f.filter(Boolean);
   }
 
@@ -142,6 +145,7 @@
     $("vList").setAttribute("aria-pressed", view === "list");
     $("loginBtn").hidden = !!token;
     $("editorBar").hidden = !token;
+    $("addBtn").hidden = !(token || listMode);
     $("dragHint").hidden = !(token && data.folders.length && data.items.length);
     renderFolders();
     renderTags();
@@ -153,7 +157,7 @@
     if (!loaded) { out.innerHTML = `<div class="empty"><strong>Carregando</strong><span>Buscando os beats…</span></div>`; return; }
     if (!list.length) {
       const empty = !data.items.length
-        ? `<strong>Nada aqui ainda</strong><span>${token ? "Clique em Adicionar pra subir o primeiro beat ou PDF." : "Os beats aparecem aqui assim que forem adicionados."}</span>`
+        ? `<strong>Nada aqui ainda</strong><span>${token || listMode ? "Clique em Adicionar pra subir o primeiro beat ou PDF." : "Os beats aparecem aqui assim que forem adicionados."}</span>`
         : total ? `<strong>Nada encontrado</strong><span>Tente outra busca, outro tipo ou limpe o filtro de tag.</span>`
         : `<strong>Pasta vazia</strong><span>${token ? "Arraste itens até esta pasta, ou escolha a pasta ao adicionar." : "Ainda não tem nada nesta pasta."}</span>`;
       out.innerHTML = `<div class="empty">${empty}</div>`;
@@ -266,8 +270,48 @@
     const clean = (it) => Object.fromEntries(Object.entries(it).filter(keep));
     return JSON.stringify({ ...(d.storage ? { storage: d.storage } : {}), folders: d.folders, items: d.items.map(clean) }, null, 2) + "\n";
   }
-  // Re-read beats.json, apply the change to the fresh copy, write it back. Retries once if someone else saved in between.
+
+  /* ---------- Cloudflare list (open adding) ---------- */
+  async function api(path, opts = {}) {
+    const r = await fetch(`${data.storage}/${path}`, { cache: "no-store", ...opts });
+    if (!r.ok) throw new GhError(r.status, await r.text().catch(() => ""));
+    return r;
+  }
+  async function readCloud() {
+    const r = await api("api/list");
+    return { data: normalize({ ...(await r.json()), storage: data.storage }), etag: (r.headers.get("ETag") || "").replace(/"/g, "") };
+  }
+  const authHeader = () => (token ? { Authorization: "Bearer " + token } : {});
+  async function publicUpload(kind, blob, extension, name) {
+    const r = await api(`api/upload?kind=${kind}&ext=${encodeURIComponent(extension)}&name=${encodeURIComponent(name)}`, {
+      method: "POST", body: blob, headers: { "Content-Type": blob.type || "application/octet-stream", ...authHeader() },
+    });
+    const { url: ref } = await r.json();
+    localUrls.set(ref, URL.createObjectURL(blob));
+    return ref;
+  }
+
+  // Apply a change to the freshest list and write it back, retrying when someone else saved in between.
   async function saveData(mutate, message) {
+    if (!listMode) return saveGithub(mutate, message);
+    for (let attempt = 0; ; attempt++) {
+      const { data: fresh, etag } = await readCloud();
+      mutate(fresh);
+      try {
+        const body = JSON.parse(serialize(fresh)); delete body.storage;
+        const r = await api("api/list", { method: "PUT", body: JSON.stringify(body), headers: { "Content-Type": "application/json", "If-Match": `"${etag}"`, ...authHeader() } });
+        listEtag = (r.headers.get("ETag") || "").replace(/"/g, "");
+        data = fresh;
+        render();
+        return;
+      } catch (e) {
+        if (attempt < 3 && e.status === 412) { await new Promise((r) => setTimeout(r, 400 * (attempt + 1))); continue; }
+        throw e.status === 401 ? new GhError(403, "") : e;
+      }
+    }
+  }
+  // Re-read beats.json on GitHub, apply the change to the fresh copy, write it back.
+  async function saveGithub(mutate, message) {
     for (let attempt = 0; ; attempt++) {
       const { data: fresh, sha } = await ghReadData();
       mutate(fresh);
@@ -310,6 +354,7 @@
     } catch (e) { /* already gone or not ours to delete: the list entry is what matters */ }
   }
   function errText(e) {
+    if (e?.status === 429 || e?.status === 415 || (e?.status === 400 && e.message)) return e.message || "Não deu pra enviar. Tente de novo.";
     if (e?.status === 401) return "O token não vale mais. Saia do editor e entre de novo com um token novo.";
     if (e?.status === 403 || e?.status === 404) return "O token não tem permissão de escrita. Confira se ele tem Contents: Read and write no repositório site_geral.";
     if (e?.status === 413 || (e?.status === 422 && /too large|size/i.test(e.message))) return "O arquivo é grande demais. Tente um MP3.";
@@ -450,6 +495,8 @@
     $("coverPrev").innerHTML = coverHTML(it || { name: "Capa", type: "beat" });
     $("coverInfo").textContent = it?.cover ? "Escolha outra imagem pra trocar a capa." : "PNG, JPG ou WebP. Fica quadrada automaticamente.";
     $("itemDelBtn").hidden = !it; $("itemConfirm").hidden = true;
+    $("authorField").hidden = !!it;
+    $("fAuthor").value = it ? "" : (store.get("tf.author") || "");
     setMsg("itemMsg", "");
     syncKind();
     open("itemDlg");
@@ -458,6 +505,7 @@
     const f = e.target.files[0]; newFile = null; newDuration = null;
     if (!f) return syncKind();
     if (f.size > maxBytes()) { setMsg("itemMsg", `Esse arquivo tem ${fmtSize(f.size)}. O limite é ${maxBytes() / MB} MB; exporte em MP3 pra ficar menor.`, true); e.target.value = ""; return; }
+    if (!isPdfFile(f) && !AUDIO_EXTS.includes(ext(f.name))) { setMsg("itemMsg", "Esse tipo de arquivo não é aceito. Use MP3, WAV, M4A, OGG, FLAC ou PDF.", true); e.target.value = ""; return; }
     setMsg("itemMsg", "");
     newFile = f;
     if (!$("fName").value.trim()) $("fName").value = f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim();
@@ -515,16 +563,30 @@
       const old = { file: editing?.file, cover: editing?.cover };
       if (newCover) {
         setMsg("itemMsg", "Enviando capa…");
-        fields.cover = await uploadFile(`beats/capas/${base}-${rand()}.jpg`, newCover, `Capa: ${name}`);
+        fields.cover = !editing && listMode
+          ? await publicUpload("capas", newCover, "jpg", base)
+          : await uploadFile(`beats/capas/${base}-${rand()}.jpg`, newCover, `Capa: ${name}`);
       }
       if (newFile) {
         setMsg("itemMsg", `Enviando ${type === "pdf" ? "PDF" : "áudio"} (${fmtSize(newFile.size)})…`);
-        fields.file = await uploadFile(`beats/${type === "pdf" ? "pdf" : "audio"}/${base}-${rand()}.${ext(newFile.name) || (type === "pdf" ? "pdf" : "mp3")}`, newFile, `${type === "pdf" ? "PDF" : "Beat"}: ${name}`);
+        const fileExt = ext(newFile.name) || (type === "pdf" ? "pdf" : "mp3");
+        fields.file = !editing && listMode
+          ? await publicUpload(type === "pdf" ? "pdf" : "audio", newFile, fileExt, base)
+          : await uploadFile(`beats/${type === "pdf" ? "pdf" : "audio"}/${base}-${rand()}.${fileExt}`, newFile, `${type === "pdf" ? "PDF" : "Beat"}: ${name}`);
         fields.size = newFile.size;
         fields.duration = type === "beat" && newDuration ? Math.round(newDuration) : null;
         fields.example = false;
       }
       setMsg("itemMsg", "Salvando a lista…");
+      if (!editing && listMode) {
+        const author = $("fAuthor").value.trim();
+        store.set("tf.author", author || null);
+        const r = await api("api/add", { method: "POST", headers: { "Content-Type": "application/json", ...authHeader() }, body: JSON.stringify({ ...fields, author, website: $("fWebsite").value }) });
+        await r.json();
+        data = (await readCloud()).data; render();
+        close($("itemForm")); toast("Adicionado! Já aparece pra todo mundo.");
+        return;
+      }
       if (editing) {
         const id = editing.id;
         await saveData((d) => { const x = d.items.find((y) => y.id === id); if (x) Object.assign(x, fields); }, `Edita: ${name}`);
@@ -572,7 +634,8 @@
         if (!ok) { setMsg("storageMsg", "Esse endereço não respondeu como o Worker do Terra Fértil. Confira se colou o código do worker.js e ligou o bucket com o nome BEATS.", true); return; }
       }
       setMsg("storageMsg", "Salvando…");
-      await saveData((d) => { d.storage = v; }, v ? "Usa o Cloudflare para os arquivos" : "Volta a guardar os arquivos no GitHub");
+      await saveGithub((d) => { d.storage = v; }, v ? "Usa o Cloudflare para os arquivos" : "Volta a guardar os arquivos no GitHub");
+      await load();
       close($("storageForm"));
       toast(v ? "Pronto. Os próximos arquivos vão para o Cloudflare." : "Pronto. Os próximos arquivos vão para o GitHub.");
     } catch (err) { setMsg("storageMsg", errText(err), true); }
@@ -599,13 +662,23 @@
   /* ---------- load ---------- */
   async function load() {
     try {
+      let boot = null;
       if (token) {
-        try { data = (await ghReadData()).data; loaded = true; failed = false; render(); return; }
+        try { boot = (await ghReadData()).data; }
         catch (e) { if (e.status === 401) { token = null; store.set("tf.token", null); toast("O token salvo não vale mais. Entre no modo editor de novo.", "err"); } }
       }
-      const r = await fetch("beats.json", { cache: "no-cache" });
-      if (!r.ok) throw new Error(r.status);
-      data = normalize(await r.json());
+      if (!boot) {
+        const r = await fetch("beats.json", { cache: "no-cache" });
+        if (!r.ok) throw new Error(r.status);
+        boot = normalize(await r.json());
+      }
+      data = boot;
+      listMode = false;
+      // beats.json says where the storage Worker is; the live list is kept there.
+      if (data.storage) {
+        try { const c = await readCloud(); data = c.data; listEtag = c.etag; listMode = true; }
+        catch (e) { /* older Worker without the list: keep using beats.json */ }
+      }
       loaded = true; failed = false;
     } catch (e) { failed = true; }
     render();
